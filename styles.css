@@ -4,8 +4,10 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f0f0f0;
+   background-image: url(https://images.pexels.com/photos/5717479/pexels-photo-5717479.jpeg?cs=srgb&dl=pexels-polina-kovaleva-5717479.jpg&fm=jpg);
     margin: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 .todo-container {
     background: #fff;
@@ -97,4 +99,18 @@ body {
 }
 i{
     font-weight: bold;
+}
+.task-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.completed .task-title,
+.completed .task-desc {
+    text-decoration: line-through;
+}
+
+.completed .delete-btn,
+.completed .edit-btn {
+    text-decoration: none; /* Ensure no strikethrough on buttons */
 }
