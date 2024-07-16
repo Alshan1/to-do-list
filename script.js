@@ -1,6 +1,9 @@
 document.getElementById('task-form').addEventListener('submit', addTask);
 document.getElementById('filter-tasks').addEventListener('change', filterTasks);
 
+let isEditing = false;
+let currentTaskItem = null;
+
 function addTask(event) {
     event.preventDefault();
 
@@ -9,44 +12,56 @@ function addTask(event) {
     const taskDate = document.getElementById('task-date').value;
 
     if (taskTitle !== '') {
-        const taskList = document.getElementById('task-list');
-
-        if (taskList.innerHTML === "List is empty.") {
-            taskList.innerHTML = '';
+        if (isEditing && currentTaskItem) {
+            // Update the existing task
+            updateTask(currentTaskItem, taskTitle, taskDesc, taskDate);
+        } else {
+            // Add a new task
+            createNewTask(taskTitle, taskDesc, taskDate);
         }
 
-        const taskItem = document.createElement('li');
-        taskItem.className = 'task-item';
-        taskItem.innerHTML = `
-            <div class="task-content">
-                <strong class="task-title">${taskTitle}</strong>
-                <p class="task-desc">${taskDesc}</p>
-                <small>Due: ${taskDate}</small>
-            </div>
-            <div>
-                <button class="delete-btn"><i class="bi bi-trash3"></i></button>
-                <button class="edit-btn"><i class="bi bi-pencil-square"></i></button>
-                <button class="complete-btn">Mark as Completed</button>
-            </div>
-        `;
-
-        taskItem.querySelector('.delete-btn').addEventListener('click', () => {
-            taskItem.remove();
-            updateEmptyListMessage();
-        });
-
-        taskItem.querySelector('.edit-btn').addEventListener('click', () => {
-            editTask(taskItem, taskTitle, taskDesc, taskDate);
-        });
-
-        taskItem.querySelector('.complete-btn').addEventListener('click', () => {
-            toggleComplete(taskItem);
-        });
-
-        taskList.appendChild(taskItem);
         $('#taskModal').modal('hide');
         document.getElementById('task-form').reset();
+        resetModal();
     }
+}
+
+function createNewTask(title, desc, date) {
+    const taskList = document.getElementById('task-list');
+
+    if (taskList.innerHTML === "List is empty.") {
+        taskList.innerHTML = '';
+    }
+
+    const taskItem = document.createElement('li');
+    taskItem.className = 'task-item';
+    taskItem.innerHTML = `
+        <div class="task-content">
+            <strong class="task-title">${title}</strong>
+            <p class="task-desc">${desc}</p>
+            <small>Due: ${date}</small>
+        </div>
+        <div>
+            <button class="delete-btn"><i class="bi bi-trash3"></i></button>
+            <button class="edit-btn"><i class="bi bi-pencil-square"></i></button>
+            <button class="complete-btn">Mark as Completed</button>
+        </div>
+    `;
+
+    taskItem.querySelector('.delete-btn').addEventListener('click', () => {
+        taskItem.remove();
+        updateEmptyListMessage();
+    });
+
+    taskItem.querySelector('.edit-btn').addEventListener('click', () => {
+        editTask(taskItem);
+    });
+
+    taskItem.querySelector('.complete-btn').addEventListener('click', () => {
+        toggleComplete(taskItem);
+    });
+
+    taskList.appendChild(taskItem);
 }
 
 function updateEmptyListMessage() {
@@ -56,7 +71,14 @@ function updateEmptyListMessage() {
     }
 }
 
-function editTask(taskItem, title, desc, date) {
+function editTask(taskItem) {
+    isEditing = true;
+    currentTaskItem = taskItem;
+
+    const title = taskItem.querySelector('.task-title').textContent;
+    const desc = taskItem.querySelector('.task-desc').textContent;
+    const date = taskItem.querySelector('small').textContent.replace('Due: ', '');
+
     document.getElementById('taskModalLabel').textContent = 'Edit Task';
     document.querySelector('#task-form button[type="submit"]').textContent = 'Update';
 
@@ -65,25 +87,15 @@ function editTask(taskItem, title, desc, date) {
     document.getElementById('task-date').value = date;
 
     $('#taskModal').modal('show');
+}
 
-    const newTaskForm = document.getElementById('task-form');
-    const newTaskFormClone = newTaskForm.cloneNode(true);
-    newTaskForm.parentNode.replaceChild(newTaskFormClone, newTaskForm);
+function updateTask(taskItem, title, desc, date) {
+    taskItem.querySelector('.task-title').textContent = title;
+    taskItem.querySelector('.task-desc').textContent = desc;
+    taskItem.querySelector('small').textContent = `Due: ${date}`;
 
-    newTaskFormClone.addEventListener('submit', function updateTask(event) {
-        event.preventDefault();
-
-        taskItem.querySelector('.task-title').textContent = document.getElementById('task-title').value;
-        taskItem.querySelector('.task-desc').textContent = document.getElementById('task-desc').value;
-        taskItem.querySelector('small').textContent = `Due: ${document.getElementById('task-date').value}`;
-
-        $('#taskModal').modal('hide');
-        document.getElementById('task-form').reset();
-        newTaskFormClone.removeEventListener('submit', updateTask);
-
-        document.getElementById('taskModalLabel').textContent = 'Add Task';
-        document.querySelector('#task-form button[type="submit"]').textContent = 'Add';
-    });
+    isEditing = false;
+    currentTaskItem = null;
 }
 
 function toggleComplete(taskItem) {
@@ -119,4 +131,11 @@ function filterTasks() {
                 break;
         }
     });
+}
+
+function resetModal() {
+    document.getElementById('taskModalLabel').textContent = 'Add Task';
+    document.querySelector('#task-form button[type="submit"]').textContent = 'Add';
+    isEditing = false;
+    currentTaskItem = null;
 }
