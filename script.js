@@ -11,7 +11,6 @@ function addTask(event) {
     if (taskTitle !== '') {
         const taskList = document.getElementById('task-list');
 
-        // Remove "List is empty." if it exists
         if (taskList.innerHTML === "List is empty.") {
             taskList.innerHTML = '';
         }
@@ -58,13 +57,15 @@ function updateEmptyListMessage() {
 }
 
 function editTask(taskItem, title, desc, date) {
+    document.getElementById('taskModalLabel').textContent = 'Edit Task';
+    document.querySelector('#task-form button[type="submit"]').textContent = 'Update';
+
     document.getElementById('task-title').value = title;
     document.getElementById('task-desc').value = desc;
     document.getElementById('task-date').value = date;
 
     $('#taskModal').modal('show');
 
-    // Remove existing event listener if any
     const newTaskForm = document.getElementById('task-form');
     const newTaskFormClone = newTaskForm.cloneNode(true);
     newTaskForm.parentNode.replaceChild(newTaskFormClone, newTaskForm);
@@ -79,6 +80,9 @@ function editTask(taskItem, title, desc, date) {
         $('#taskModal').modal('hide');
         document.getElementById('task-form').reset();
         newTaskFormClone.removeEventListener('submit', updateTask);
+
+        document.getElementById('taskModalLabel').textContent = 'Add Task';
+        document.querySelector('#task-form button[type="submit"]').textContent = 'Add';
     });
 }
 
@@ -86,7 +90,7 @@ function toggleComplete(taskItem) {
     const title = taskItem.querySelector('.task-title');
     const desc = taskItem.querySelector('.task-desc');
     const completeBtn = taskItem.querySelector('.complete-btn');
-    
+
     if (taskItem.classList.toggle('completed')) {
         title.classList.add('completed');
         desc.classList.add('completed');

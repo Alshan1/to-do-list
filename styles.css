@@ -88,14 +88,17 @@ body {
 
 .delete-btn {
     background-color: #dc3545;
+    border-radius: 10px;
 }
 
 .edit-btn {
     background-color: #28a745;
+    border-radius: 10px;
 }
 
 .complete-btn {
     background-color: #007bff;
+    border-radius: 10px;
 }
 i{
     font-weight: bold;
@@ -112,5 +115,5 @@ i{
 
 .completed .delete-btn,
 .completed .edit-btn {
-    text-decoration: none; /* Ensure no strikethrough on buttons */
+    text-decoration: none; 
 }
